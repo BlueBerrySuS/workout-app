@@ -1,15 +1,23 @@
 import { useState } from "react"
 import s from "./SignUp.module.css"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import HideButton from "../../components/hideButton/HideButton";
+import { regUser } from "../../utils/resOptions.js";
+import { useAuth } from "../../context/AuthContext/AuthContext.jsx";
+import Toast from "../../components/Toast/Toast.jsx";
 
 const SignUp = () => {
+    const userContext = useAuth();
+    const nav = useNavigate();
+
+    const [toast, setToast] = useState(null)
 
     const [formData, setFormData] = useState({
         name: "",
         surname: "",
         email: "",
-        password: ""
+        password: "",
+        isRemember: false
     });
     const [isVisible, setIsVisible] = useState(false)
 
@@ -18,13 +26,35 @@ const SignUp = () => {
         setFormData(newFormData);
     }
 
-    const handleFormSubmit = (e) => {
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
         console.log(formData);
+        if(formData.name.length <= 3) {
+            setToast({id: Date.now(), type: "error", message: "name must be longer then 3 symbols"})
+            return;
+        } else if(formData.surname.length <=3) {
+            console.error("surname must be longer then 3 symbols")
+            return;
+        } else if(formData.password.length < 6) {
+            console.error("password must be longer then 6 symbols")
+            return;
+        }
+        try {
+            const res = await regUser(formData);
+            userContext.setToken(res.data.token);
+            userContext.setEmail(res.data.user.email);
+            userContext.setName(res.data.user.name);
+            userContext.setIsAuth(true);
+            userContext.setIsRemember(formData.isRemember);
+            nav("/");
+        } catch(error) {
+            console.error(error);
+        }
     }
 
     return (
         <>
+            {toast && <Toast key={toast.id} type={toast.type} message={toast.message}/>}
             <div className={s.page__wrapper}>
                 <form action="post" className={s.form} onSubmit={handleFormSubmit}>
                     <h1 className={s.form__title}>Регистрация</h1>
@@ -77,11 +107,11 @@ const SignUp = () => {
                     </div>
 
                     <div className={s.form__checkbox}>
-                        <input type="checkbox" name="remember" id="remember"/>
+                        <input type="checkbox" name="remember" id="remember" onChange={(e) => handleFormChange("isRemember", e.target.value)}/>
                         <label htmlFor="remember">Запомнить меня</label>
                     </div>
                     <button className={s.form__button} type="submit">Создать аккаунт</button>
-                    <div>Есть аккаунт? <Link to="login">Войти</Link></div>
+                    <div>Есть аккаунт? <Link to="/login">Войти</Link></div>
                 </form>
             </div>
         </>

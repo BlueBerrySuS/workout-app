@@ -1,5 +1,5 @@
 import { useState } from "react"
-import closetEyeImg from '../../assets/eye-closet.svg'
+import closedEyeImg from '../../assets/eye-closed.svg'
 import openEyeImg from '../../assets/eye-open.svg'
 
 
@@ -13,7 +13,7 @@ const HideButton = ({onHandleClick}) => {
                 setIsvisible(!isVisible); 
                 onHandleClick()
             }} 
-        ><img src={isVisible? openEyeImg : closetEyeImg} alt="" /></button>
+        ><img src={isVisible? openEyeImg : closedEyeImg} alt="" /></button>
     )
 }
 

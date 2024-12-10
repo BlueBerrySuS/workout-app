@@ -1,0 +1,36 @@
+
+.toast {
+    position: fixed;
+    bottom: 20px; /* Позиция, на которой отображается тост */
+    right: 20px;
+    background-color: #fff; /* Цвет фона */
+    border-radius: 8px;
+    padding: 10px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.5s ease-out, fadeOut 0.5s ease-in 2.5s forwards;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px); /* Появление снизу */
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0); /* Сохраняем текущее положение */
+    }
+    to {
+      opacity: 0;
+      transform: translateY(20px); /* Уходит вниз */
+    }
+  }
