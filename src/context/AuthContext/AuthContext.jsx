@@ -1,59 +1,39 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react";
+import { getProfile } from "../../utils/resOptions";
 
 const AuthContext = createContext();
 
-const AuthProvider = ({children}) => {
-    const [isAuth, setIsAuth] = useState(false); 
-    const [token, setToken] = useState(null);
-    const [email, setEmail] = useState(null);
-    const [name, setName] = useState(null);
-    const [isRemember, setIsRemember] = useState(false);
-    const [loading, setLoading] = useState(true);
+const AuthProvider = ({ children }) => {
+  const [data, setData] = useState(null);
+  const [isAuth, setIsAuth] = useState(false);
 
-    useEffect(() => {
-        const savedUserData = JSON.parse(localStorage.getItem("userData"))
-        if(savedUserData) {
-            setIsAuth(true);
-            setToken(savedUserData.token);
-            setEmail(savedUserData.email);
-            setName(savedUserData.name);
-            setIsRemember(savedUserData.isRemember)
-        }
-        setLoading(false);
-    }, [])
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      getProfile().then((res) => setData(res.data));
+      setIsAuth(true);
+    }
+  }, []);
 
-    useEffect(() => {
-        if(isRemember) {
-            const userData = {token, email, name, isRemember}
-            localStorage.setItem("userData", JSON.stringify(userData))
-        } else {
-            localStorage.removeItem("userData")
-        }
-    }, [isRemember, email, name, token])
+  useEffect(() => {
+    if (!userData && isAuth) getProfile().then((res) => setData(res.data));
+  }, [isAuth]);
 
-
-
-    return (
-        <AuthContext.Provider value={{
-            isAuth,
-            setIsAuth,
-            token,
-            setToken,
-            email,
-            setEmail,
-            name,
-            setName,
-            isRemember,
-            setIsRemember,
-            loading
-        }}>
-            {children}
-        </AuthContext.Provider>
-    )
-}
+  return (
+    <AuthContext.Provider
+      value={{
+        isAuth,
+        setIsAuth,
+        data,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
 export const useAuth = () => {
-    return useContext(AuthContext);
-}
+  return useContext(AuthContext);
+};
 
 export default AuthProvider;
