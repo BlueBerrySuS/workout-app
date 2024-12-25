@@ -2,13 +2,12 @@ import { useState } from "react"
 import s from "./SignUp.module.css"
 import { Link, useNavigate } from "react-router-dom"
 import HideButton from "../../components/hideButton/HideButton";
-import { regUser } from "../../utils/resOptions.js";
-import { useAuth } from "../../context/AuthContext/AuthContext.jsx";
 import Toast from "../../components/Toast/Toast.jsx";
+import { useAuthStore } from "../../zustand/useAuthStore.js";
 
 const SignUp = () => {
-    const userContext = useAuth();
     const nav = useNavigate();
+    const {regUser, isLoading} = useAuthStore();
 
     const [toast, setToast] = useState(null)
 
@@ -17,13 +16,17 @@ const SignUp = () => {
         surname: "",
         email: "",
         password: "",
-        isRemember: false
+        rememberMe: false
     });
     const [isVisible, setIsVisible] = useState(false)
 
     const handleFormChange = (inputName, value) => {
         const newFormData = {...formData, [inputName]: value};
         setFormData(newFormData);
+    }
+
+    const handleNav = () => {
+        nav("/")
     }
 
     const handleFormSubmit = async (e) => {
@@ -40,13 +43,7 @@ const SignUp = () => {
             return;
         }
         try {
-            const res = await regUser(formData);
-            userContext.setToken(res.data.token);
-            userContext.setEmail(res.data.user.email);
-            userContext.setName(res.data.user.name);
-            userContext.setIsAuth(true);
-            userContext.setIsRemember(formData.isRemember);
-            nav("/");
+            await regUser({...formData, nav: handleNav});
         } catch(error) {
             console.error(error);
         }
@@ -107,10 +104,17 @@ const SignUp = () => {
                     </div>
 
                     <div className={s.form__checkbox}>
-                        <input type="checkbox" name="remember" id="remember" onChange={(e) => handleFormChange("isRemember", e.target.value)}/>
+                        <input 
+                            type="checkbox" 
+                            name="remember" 
+                            id="remember"
+                            checked={formData.rememberMe} 
+                            onChange={(e) => handleFormChange("rememberMe", e.target.checked)}
+                        />
                         <label htmlFor="remember">Запомнить меня</label>
                     </div>
-                    <button className={s.form__button} type="submit">Создать аккаунт</button>
+                    <button className={s.form__button} type="submit" disabled={isLoading}>Создать аккаунт</button>
+                    {isLoading && <div>Loading</div>}
                     <div>Есть аккаунт? <Link to="/login">Войти</Link></div>
                 </form>
             </div>

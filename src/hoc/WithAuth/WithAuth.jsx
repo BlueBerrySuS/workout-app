@@ -1,9 +1,11 @@
 import { Navigate } from "react-router-dom";
+import { useAuthStore } from "../../zustand/useAuthStore";
 
 const WithAuth = ({ children }) => {
-  const token =
-    localStorage.getItem("Token") || sessionStorage.getItem("token");
+  const {token} = useAuthStore();
 
   if (token) return children;
   else return <Navigate to={"/login"} />;
 };
+
+export {WithAuth}

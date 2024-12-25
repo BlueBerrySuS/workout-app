@@ -1,15 +1,15 @@
-import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
-import { useUserContext } from "../../context/AuthContext/AuthContext";
+import { useAuthStore } from "../../zustand/useAuthStore";
+
 
 const ProfilePage = () => {
-  const userContext = useUserContext();
+  const {logout} = useAuthStore();
 
   return (
     <>
-      <p>Token: {userContext.token}</p>
-      <p>Name: {userContext.name}</p>
-      <p>Email: {userContext.email}</p>
+      <p className="bg-yellow-100 h-[100px]">Token: TEXT</p>
+      <p>Name: TEXt</p>
+      <p>Email: TEXT</p>
+      <button onClick={() => logout()}> logout</button>
     </>
   );
 };
